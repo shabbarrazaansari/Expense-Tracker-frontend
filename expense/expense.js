@@ -6,10 +6,12 @@ function onLoad() {
     console.log(decodedToken)
     const isAdmin = decodedToken.ispremiumuser;
     if(isAdmin){
-        showPremiumUser(isAdmin);
-        showLeaderboad();
-    }
-    axios.get('http://localhost:1000/login/expense',{headers:{'Authorization':token}})
+            showPremiumUser(isAdmin);
+            showLeaderboad();
+            download();
+            
+        }
+     axios.get('http://localhost:1000/login/expense',{headers:{'Authorization':token}})
     .then(response=>{
         console.log(response)
         for (let i=0 ;i< response.data.length;i++ ) {
@@ -18,7 +20,12 @@ function onLoad() {
         }
     })
     
+   
+    
 }
+// function premiumFeatures(){
+//     const 
+// }
 // parsing function
 function parseJwt (token) {
     var base64Url = token.split('.')[1];
@@ -31,7 +38,8 @@ function parseJwt (token) {
 }
 function showPremiumUser(isAdmin) {
     document.getElementById('rzp-button1').style.visibility = 'hidden';
-    document.getElementById('message').innerHTML = 'you are a premium user'
+    document.getElementById('message').innerHTML = 'you are a premium user';
+    document.getElementById('incomeDiv').style.display = 'block';
 }
 
 function expense(e) {
@@ -39,13 +47,18 @@ function expense(e) {
     // console.log(e);
    
     const amount = document.getElementById('amount').value;
+    const income = document.getElementById('income').value
     const description = document.getElementById('description').value;
     const option = document.getElementById('selection').value;
     const token = localStorage.getItem('token')
+    const date = document.getElementById('date').value;
     axios.post("http://localhost:1000/login/expense",{
         amount:amount,
         description:description,
         category:option,
+        income:income,
+        date:date
+
 
     },{headers:{'Authorization':token}})
     .then(response=>{
@@ -81,7 +94,7 @@ function showLeaderboad() {
         const token = localStorage.getItem('token');
         const userLeaderboardData = await axios.get('http://localhost:1000/premium/showleaderboard',{headers:{'Authorization':token}});
         console.log(userLeaderboardData);
-        var leaderboardElem = document.getElementById('leaderboad');
+        var leaderboardElem = document.getElementById('leaderboard');
         userLeaderboardData.data.forEach((element )=> {
             leaderboardElem.innerHTML += `<li>Name - ${element.name} Total expense ${element.totalExpenses}`
         });
@@ -124,10 +137,12 @@ document.getElementById('rzp-button1').onclick = async function(e) {
             console.log(res.body)
             alert('you are a premium user now');
             document.getElementById('rzp-button1').style.visibility = 'hidden';
-            document.getElementById('message').innerHTML = 'you are a premium user'
+            document.getElementById('message').innerHTML = 'you are a premium user';
+            document.getElementById('incomeDiv').style.display = 'block'
             
             localStorage.setItem('token',res.data.token)
             showLeaderboad();
+            download();
             onLoad()
         },
     };
@@ -138,4 +153,14 @@ document.getElementById('rzp-button1').onclick = async function(e) {
         console.log(response)
         alert('something went wrong')
     })
+}
+function download() {
+    const table = document.createElement('input');
+    table.type = "button";
+    table.value = 'Report';
+    table.onclick = ()=>{
+     
+        window.location.href = "../table/table.html"
+    }
+    document.getElementById('message').appendChild(table);
 }

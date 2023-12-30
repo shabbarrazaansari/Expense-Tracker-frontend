@@ -43,28 +43,56 @@ document.getElementById('getTable').addEventListener("click", getTable);
     expenseCell.innerHTML = response.amount;
 
 }
-    document.getElementById('download').addEventListener('click', function () {
-        // Get the HTML content of the entire page
-        document.getElementById('download').style.display = 'none';
-        // const pageContent = document.documentElement.outerHTML;
-        const pageContent = 'Hello, this is the content to download.';
+//  this page was for only print ony print table 
+    // document.getElementById('download').addEventListener('click', function () {
+    //     // Get the HTML content of the entire page
+    //     // document.getElementById('download').style.display = 'none';
+    //     // // const pageContent = document.documentElement.outerHTML;
+    //     // const pageContent = 'Hello, this is the content to download.';
 
-        // Create a Blob with the page content
-        const blob = new Blob([pageContent], { type: 'text/html' });
+    //     // // Create a Blob with the page content
+    //     // const blob = new Blob([pageContent], { type: 'text/html' });
 
-        // Create a download link
-        const a = document.createElement('a');
-        a.href = window.URL.createObjectURL(blob);
-        a.download = 'downloaded_page.html';
+    //     // Create a download link
+    //     const a = document.createElement('a');
+    //     // a.href = window.URL.createObjectURL(blob);
 
-        // Append the link to the body
-        document.body.appendChild(a);
+    //     a.download = 'downloaded_page.html';
 
-        // Programmatically click the link to trigger the download
-        a.click();
+    //     // Append the link to the body
+    //     document.body.appendChild(a);
 
-        // Remove the link from the body
-        document.body.removeChild(a);
-    });
+    //     // Programmatically click the link to trigger the download
+    //     a.click();
+
+    //     // Remove the link from the body
+    //     document.body.removeChild(a);
+    // });
+    document.getElementById('download').addEventListener('click', async ()=>{
+        const token = localStorage.getItem('token');
+
+        await axios.get('http://localhost:1000/download',{headers:{'Authorization':token}})
+        .then((response) => {
+            if(response.status === 201){
+                //the bcakend is essentially sending a download link
+                //  which if we open in browser, the file would download
+                let a = document.createElement("a");
+                a.href = response.data.url;
+                // console.log(a)
+                // console.log(response.data.url)
+                a.download = 'myexpense.txt';
+                a.click();
+            } else {
+                throw new Error(response.data.message)
+            }
+    
+        })
+        .catch((err) => {
+            showError(err)
+        });
+
+    })
+
+
 
 
